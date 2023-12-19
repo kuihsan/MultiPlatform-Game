@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            float waitTime = Random.Range(0.5f, 2f);
+            float waitTime = Random.Range(0.75f, 2f);
             yield return new WaitForSeconds(waitTime);
             Instantiate(obstacle, spawnPoint.position, Quaternion.identity);
         }
