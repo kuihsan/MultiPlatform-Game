@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     public GameObject playButton;
     public GameObject player;
     public GameObject ground;
+    public GameObject tree;
+    public AudioSource music;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +38,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+        IEnumerator SpawnTree()
+    {
+        while (true)
+        {
+            float waitTime = 1;
+            yield return new WaitForSeconds(waitTime);
+            Instantiate(tree, spawnPoint.position, Quaternion.identity);
+        }
+    }
+
     void ScoreUp()
     {
         score++;
@@ -47,8 +59,11 @@ public class GameManager : MonoBehaviour
         player.SetActive(true);
         playButton.SetActive(false);
         ground.SetActive(true);
+        tree.SetActive(true);
         StartCoroutine("SpawnObstacles");
+        StartCoroutine("SpawnTree");
         InvokeRepeating("ScoreUp", 2f, 1f);
+        music.Play();
     }
 
 }
