@@ -5,16 +5,16 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
 
-    public GameObject obstacle;
+    public GameObject [] obstacle;
     public Transform spawnPoint;
     int score = 0;
-
     public TextMeshProUGUI scoreText;
     public GameObject playButton;
     public GameObject player;
     public GameObject ground;
     public GameObject tree;
     public AudioSource music;
+    private GameObject Obstacles;
 
     // Start is called before the first frame update
     void Start()
@@ -29,12 +29,14 @@ public class GameManager : MonoBehaviour
     }
 
     IEnumerator SpawnObstacles()
-    {
+    {       
         while (true)
-        {
-            float waitTime = Random.Range(0.75f, 2f);
+        {           
+            int RandomOption = Random.Range(0, obstacle.Length);
+            Obstacles = obstacle[RandomOption];
+            float waitTime = Random.Range(1f, 3f);
             yield return new WaitForSeconds(waitTime);
-            Instantiate(obstacle, spawnPoint.position, Quaternion.identity);
+            Instantiate(Obstacles, spawnPoint.position, Quaternion.identity);
         }
     }
 
