@@ -1,71 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-public class GameManager : MonoBehaviour
-{
+using UnityEngine.UI;
 
-    public GameObject [] obstacle;
-    public Transform spawnPoint;
-    int score = 0;
-    public TextMeshProUGUI scoreText;
-    public GameObject playButton;
-    public GameObject player;
-    public GameObject ground;
-    public GameObject tree;
-    public AudioSource music;
-    private GameObject Obstacles;
+public class GameManager : MonoBehaviour {
+    public static bool gameOver;
+    public static bool isGameStarted;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    public GameObject gameOverPanel;
+    public GameObject tapToStartText;
+
+    public int cheat;
+    public static int numberOfCoins;
+    public Text coinText;
+
+    private void Start() {
+        gameOver = false;
+        Time.timeScale = 1;
+        isGameStarted = false;
+
+        gameOverPanel.SetActive(false);
+       tapToStartText.SetActive(true);
+
+        //numberOfCoins = 0;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Update() {
+        if (gameOver == true) {
+            gameOverPanel.SetActive(true);
+        }
 
-    IEnumerator SpawnObstacles()
-    {       
-        while (true)
-        {           
-            int RandomOption = Random.Range(0, obstacle.Length);
-            Obstacles = obstacle[RandomOption];
-            float waitTime = Random.Range(1f, 3f);
-            yield return new WaitForSeconds(waitTime);
-            Instantiate(Obstacles, spawnPoint.position, Quaternion.identity);
+        coinText.text = "Coins: " + (numberOfCoins + cheat);
+
+        if (isGameStarted == false) {
+            if (SwipeManager.tap) {
+                isGameStarted = true;
+                tapToStartText.SetActive(false);
+                FindObjectOfType<AudioManager>().PlaySound("Background");
+            }
         }
     }
 
-        IEnumerator SpawnTree()
+    public void Bought()
     {
-        while (true)
-        {
-            float waitTime = 1;
-            yield return new WaitForSeconds(waitTime);
-            Instantiate(tree, spawnPoint.position, Quaternion.identity);
-        }
+        
+        numberOfCoins = 0;
+        cheat = 0;
     }
-
-    void ScoreUp()
-    {
-        score++;
-        scoreText.text = score.ToString();
-    }
-
-    public void GameStart()
-    {
-        player.SetActive(true);
-        playButton.SetActive(false);
-        ground.SetActive(true);
-        tree.SetActive(true);
-        StartCoroutine("SpawnObstacles");
-        StartCoroutine("SpawnTree");
-        InvokeRepeating("ScoreUp", 2f, 1f);
-        music.Play();
-    }
-
 }

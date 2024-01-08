@@ -1,117 +1,132 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class PlayerController : MonoBehaviour
-{
-    Rigidbody rb;
+public class PlayerController : MonoBehaviour {
+    private CharacterController controller;
+    private Vector3 direction;
+    private int desiredLane = 1; // 0:left, 1:middle, 2: right
+
+    public float forwardSpeed;
+    public float maxSpeed;
+    public float laneDistance;
+    public float smoothSpeed;
     public float jumpForce;
-    bool canJump;
-    public AudioSource jump;
-    private Vector2 startTouchPosition, endTouchPosition;
-    private Touch touch;
-    private IEnumerator goCoroutine;
-    private bool coroutineAllowed;
+    public float gravityForce;
+
+    public Animator animator;
+
+    private float appliedGravity; // the gravity that is used during update (for swipe down gesture)
+    private bool isSliding;
 
 
 
-
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody>();
+    void Start() {
+        controller = GetComponent<CharacterController>();
+        appliedGravity = gravityForce;
+        isSliding = false;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        coroutineAllowed = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-        if(Input.touchCount > 0)
-        {
-            touch = Input.GetTouch(0);
+    void Update() {
+        if (GameManager.isGameStarted == false) {
+            return;
         }
 
-        if(touch.phase == TouchPhase.Began)
-        {
-            startTouchPosition = touch.position;
+        if (forwardSpeed < maxSpeed) {
+            forwardSpeed += Time.deltaTime;
         }
 
-        if (Input.touchCount > 0 && touch.phase == TouchPhase.Ended && coroutineAllowed)
-        { 
-            endTouchPosition = touch.position;
-            
-            if((endTouchPosition.x > startTouchPosition.x))
-            {
-                rb.AddForce(Vector3.right * 2, ForceMode.Impulse);
-                Debug.Log("kanan");
+        animator.SetBool("isGameStarted", true);
+        animator.SetBool("isGrounded", controller.isGrounded);
+
+        direction.z = forwardSpeed;
+
+        if (controller.isGrounded) {
+            if (appliedGravity > gravityForce) {
+                StartCoroutine(Slide());
+
+            }
+            appliedGravity = gravityForce;
+
+            if (SwipeManager.swipeUp) {
+                StopAllCoroutines();
+                StopSlide();
+                Jump();
             }
 
-            else if ((endTouchPosition.x < startTouchPosition.x))
-            {
-                rb.AddForce(Vector3.left * 2, ForceMode.Impulse);
-                Debug.Log("kiri");
+            if (SwipeManager.swipeDown && !isSliding) {
+                StartCoroutine(Slide());
+            }
+        } else {
+            if (SwipeManager.swipeDown) {
+                appliedGravity = 10 * gravityForce;
             }
 
-
-
-
+            direction.y -= appliedGravity * Time.deltaTime;
         }
 
+        if (SwipeManager.swipeRight && desiredLane < 2) {
+            desiredLane++;
+        }
 
-        if (Input.GetMouseButtonDown(0) && canJump)
-        {
-            //jump
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            jump.Play();
+        if (SwipeManager.swipeLeft && desiredLane > 0) {
+            desiredLane--;
+        }
+
+    }
+
+    private void FixedUpdate() {
+        if (GameManager.isGameStarted == false) {
+            return;
+        }
+
+        controller.Move(direction * Time.fixedDeltaTime);
+
+        Vector3 targetPosition = transform.position;
+
+        if (desiredLane == 0) {
+            targetPosition.x = -laneDistance;
+        } else if (desiredLane == 2) {
+            targetPosition.x = laneDistance;
+        } else {
+            targetPosition.x = 0f;
+        }
+
+        transform.position = Vector3.Lerp(transform.position, targetPosition, smoothSpeed * Time.fixedDeltaTime);
+    }
+
+    private void Jump() {
+        direction.y = jumpForce;
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit) {
+        if (hit.transform.tag == "Obstacle") {
+            FindObjectOfType<AudioManager>().StopSound("Background");
+            FindObjectOfType<AudioManager>().PlaySound("GameOver");
+
+            GameManager.gameOver = true;
+            Time.timeScale = 0;
         }
     }
 
-    private IEnumerator Go(Vector3 direction)
-    {
-        coroutineAllowed = false;
-
-        for (int i = 0; i <= 2; i++)
-        {
-            transform.Translate(direction);
-            yield return new WaitForSeconds(0.01f);
-        }
-
-        for (int i = 0; i <= 2; i++)
-        {
-            transform.Translate(direction);
-            yield return new WaitForSeconds(0.01f);
-        }
-        transform.Translate(direction);
-        coroutineAllowed = true;
+    private IEnumerator Slide() {
+        StartSlide();
+        yield return new WaitForSeconds(1.3f);
+        StopSlide();
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-       if (collision.gameObject.tag == "Ground")
-        {
-            canJump = true;
-        }
+    private void StartSlide() {
+        isSliding = true;
+        animator.SetBool("isSliding", isSliding);
+        controller.center = new Vector3(0, -0.5f, 0);
+        controller.height = 1f;
     }
 
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            canJump = false;
-        }
+    private void StopSlide() {
+        isSliding = false;
+        animator.SetBool("isSliding", isSliding);
+        controller.center = new Vector3(0, 0, 0);
+        controller.height = 2f;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.tag == "Obstacle")
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-    }
 }

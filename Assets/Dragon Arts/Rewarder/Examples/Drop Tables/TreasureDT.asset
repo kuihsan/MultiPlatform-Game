@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f7ebb837bc01c4da4e31a5a114841c, type: 3}
+  m_Name: TreasureDT
+  m_EditorClassIdentifier: 
+  uid: DT-m1WQDFJOob
+  label: Treasure
+  description: Drop Table for the Scene ExampleTreasure
+  rows:
+  - uid: E2qIv
+    weight: 50
+    item: {fileID: 11400000, guid: 21bb06472edd8b94f983c12dba6e1ce6, type: 2}
+    quantity: 
+  - uid: LVBKp
+    weight: 15
+    item: {fileID: 11400000, guid: f925242cd8e959e4198b680d4ffce28f, type: 2}
+    quantity: 02000000
+  - uid: cighM
+    weight: 5
+    item: {fileID: 11400000, guid: 65f24c3f0043a44479375fb534db2457, type: 2}
+    quantity: 03000000
+  - uid: mrfWK
+    weight: -1
+    item: {fileID: 11400000, guid: 26041e80616357a41acbb649dd9bc9f0, type: 2}
+    quantity: 19000000fa00000005000000

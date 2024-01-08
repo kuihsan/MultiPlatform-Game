@@ -5,17 +5,27 @@ using UnityEngine.SceneManagement;
 
 public class Shop : MonoBehaviour
 {
+
+    public GameObject Camera1;
+    public GameObject Camera2;
+
+    public GameObject character1;
+    public GameObject character2;
+
+
 public void Character1()
     {
-        SceneManager.LoadScene("Character 1");
+        Camera1.SetActive(true);
+        Camera2.SetActive(false);
+        character1.SetActive(true);
+        character2.SetActive(false);
     }
-public void Character2()
+    public void Character2()
     {
-        SceneManager.LoadScene("Character 2");
-    }
-public void Character3()
-    {
-        SceneManager.LoadScene("Character 3");
+        Camera1.SetActive(false);
+        Camera2.SetActive(true);
+        character1.SetActive(false);
+        character2.SetActive(true);    
     }
 public void Back()
     {

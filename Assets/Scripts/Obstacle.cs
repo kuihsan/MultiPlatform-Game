@@ -5,7 +5,6 @@ using UnityEngine;
 public class Obstacle : MonoBehaviour
 {
     public float speed;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +19,7 @@ public class Obstacle : MonoBehaviour
 
     private void OnBecameInvisible()
     {
+        Debug.Log("destroy0");
         Destroy(gameObject);
     }
 }
